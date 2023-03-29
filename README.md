@@ -70,3 +70,52 @@ every day through the populate API. Could you describe a suitable solution to au
 #### Question 3:
 Both the current database schema and the files dropped in the S3 bucket are not optimal.
 Can you find ways to improve them?
+
+#### Answer 1:
+
+To make this project production ready we’ll have to be sure it is ready technically first:
+- Make sure the code is as clean as possible
+    - Make sure the form request are properly done
+    - Make sure all types of errors are handled (and response format is control also)
+    - Adding comments into the code if needed
+    - Linter all green (coding style, code optimize analyser, coverage etc.)
+- Make sure to add logs (or marketing events) to be able to watch production
+- Code is fully tested and testable adding seeders
+- Make sure the documentation is done
+- Make sure it’s not breaking not related stuffs
+
+It’s important also to be able to follow the project once it’s in production:
+- We should build dashboards to follow the execution based on events and logs we added
+    - Product oriented dashboards to follow KPI’s and execution
+    - Infra performance dashboard
+    - Alerting configured
+    - Be aware of not having new entries on error monitoring tools
+
+Once we are ready to deploy, make sure to have a production todo document to make sure we are executing all that is necessary:
+- Are all configurations defined ?
+- Are impacted external services (file storage in our case) ready?
+- Define a strategy to rollback if something goes wrong
+- Communication to the right people or channel to follow project deployment
+
+
+Not related here to the production action plan but it’s essential to define first the project goals and KPI’s to follow before working on the technical aspect.
+
+Technical architecture should be documented and challenged by the team to be sure we are applying the right solution.
+
+
+#### Answer 2:
+
+The main challenge here is to know whenever there is a new file in the bucket to populate it in the database instead of requesting it regularly threw a job.
+So the cleanest solution here could be to use a lambda that is triggered every time a new file is added in the bucket.
+
+In addition with this serverless we could directly parse the json and add new resources into the database.
+But the best solution for me will be to call directly the populate API to manage the new files to make sure everything is properly working and monitored.
+The populate API will have the url in the request instead of having files directly into the code.
+So the role of the lambda will be to be triggered once there is a new file and call directly the populate endpoint passing the file url in the request.
+
+
+#### Answer 3:
+
+The first reflex is to understand why it's not optimal. Indeed having an approach pragmatic in determining the needs and the solution we could implement is essential.
+Is relational DB filled by s3 files is enough to manage those resources ? If not, what about considering a noSQL database to increase performance ? Indeed, its horizontal scaling system allows it to be very efficient even when data are growing.
+Another solution could be to use a system like AWS Athena that provide tools to query s3 using SQL. Athena is serverless, so there is no infrastructure to manage but we have to be aware about the cost of that kind of solution (pay for each query run)
